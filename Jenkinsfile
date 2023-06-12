@@ -1,22 +1,57 @@
 pipeline {
     agent any
-
+    
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: 'main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/vastevenson/pytest-intro-vs.git']]])
+                git 'https://github.com/your/repo.git'  
             }
         }
+        
         stage('Build') {
             steps {
-                git branch: 'main', url: 'https://github.com/vastevenson/pytest-intro-vs.git'
-                sh 'python3 ops.py'
+                // Add build steps here (e.g., compiling code, running tests)
             }
         }
-        stage('Test') {
+        
+        stage('Deploy to Dataiku') {
             steps {
-                sh 'python3 -m pytest'
+                script {
+                    def dataikuApiUrl = 'https://your-dataiku-instance.com/public/api'  // Replace with your Dataiku API URL
+                    def apiKey = 'your-api-key'  // Replace with your Dataiku API key
+                    
+                    def projectId = 'your-project-id'  // Replace with the ID of your Dataiku project
+                    def bundlePath = '/path/to/bundle.zip'  // Replace with the path to your Dataiku bundle
+                    
+                    def deployUrl = "${dataikuApiUrl}/projects/${projectId}/bundles/upload"
+                    
+                    def uploadResponse = httpRequest(
+                        acceptType: 'APPLICATION_JSON',
+                        contentType: 'APPLICATION_OCTET_STREAM',
+                        customHeaders: [[name: 'Authorization', value: "Bearer ${apiKey}"]],
+                        httpMode: 'POST',
+                        requestBodyFile: bundlePath,
+                        url: deployUrl
+                    )
+                    
+                    if (uploadResponse.status != 200) {
+                        error("Failed to upload bundle to Dataiku. Status code: ${uploadResponse.status}")
+                    }
+                }
+            }
+        }
+        
+        stage('Test API') {
+            steps {
+                // Add steps to test your API service in Dataiku
+            }
+        }
+        
+        stage('Cleanup') {
+            steps {
+                // Add cleanup steps here (e.g., deleting temporary files)
             }
         }
     }
 }
+
