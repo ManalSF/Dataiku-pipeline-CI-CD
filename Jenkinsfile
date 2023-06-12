@@ -1,57 +1,62 @@
 pipeline {
     agent any
     
+    environment {
+        API_SERVICE_ID = "defect_detection"
+        API_ENDPOINT_ID = "predict_defect"
+        DESIGN_URL = "http://35.181.135.32:16000/"
+        DESIGN_API_KEY = "2GEJJFF192HSWH3JRMKFXYDRBEVWQ559"
+        API_DEV_INFRA_ID = "api-node-dev"
+        API_PROD_INFRA_ID = "api-node-prod"
+    }
+    
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/your/repo.git'  
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ManalSF/Jenkins-dataiku-python-test.git']])
             }
         }
         
         stage('Build') {
             steps {
-                // Add build steps here (e.g., compiling code, running tests)
+                // Build steps here (e.g., compiling code, running tests)
+                echo 'Hello'
             }
         }
         
-        stage('Deploy to Dataiku') {
+        stage('Dataiku API Testing') {
             steps {
-                script {
-                    def dataikuApiUrl = 'https://your-dataiku-instance.com/public/api'  // Replace with your Dataiku API URL
-                    def apiKey = 'your-api-key'  // Replace with your Dataiku API key
-                    
-                    def projectId = 'your-project-id'  // Replace with the ID of your Dataiku project
-                    def bundlePath = '/path/to/bundle.zip'  // Replace with the path to your Dataiku bundle
-                    
-                    def deployUrl = "${dataikuApiUrl}/projects/${projectId}/bundles/upload"
-                    
-                    def uploadResponse = httpRequest(
-                        acceptType: 'APPLICATION_JSON',
-                        contentType: 'APPLICATION_OCTET_STREAM',
-                        customHeaders: [[name: 'Authorization', value: "Bearer ${apiKey}"]],
-                        httpMode: 'POST',
-                        requestBodyFile: bundlePath,
-                        url: deployUrl
-                    )
-                    
-                    if (uploadResponse.status != 200) {
-                        error("Failed to upload bundle to Dataiku. Status code: ${uploadResponse.status}")
-                    }
-                }
-            }
-        }
-        
-        stage('Test API') {
-            steps {
-                // Add steps to test your API service in Dataiku
-            }
-        }
-        
-        stage('Cleanup') {
-            steps {
-                // Add cleanup steps here (e.g., deleting temporary files)
+                // Make API calls to Dataiku for testing
+
+                // Example: Trigger a Dataiku scenario
+                bat """
+                    curl -X POST ^
+                    -H "Content-Type: application/json" ^
+                    -H "Authorization: Bearer 2GEJJFF192HSWH3JRMKFXYDRBEVWQ559" ^
+                    -d "{\"service_id\": \"defect_detection\", \"endpoint_id\": \"predict_defect\"}" ^
+                    http://35.181.135.32:16000/v2/scenarios
+                """
+                
+                // Example: Deploy to development infrastructure
+                bat """
+                    curl -X POST ^
+                    -H "Content-Type: application/json" ^
+                    -H "Authorization: Bearer 2GEJJFF192HSWH3JRMKFXYDRBEVWQ559" ^
+                    -d "{\"infraId\": \"api-node-dev\", \"serviceId\": \"defect_detection\"}" ^
+                    http://35.181.135.32:16000/v2/infrastructures/deploy
+                """
+                bat """
+                    curl -X POST ^
+                    -H "Content-Type: application/json" ^
+                    -H "Authorization: Bearer 2GEJJFF192HSWH3JRMKFXYDRBEVWQ559" ^
+                    -d "{\"infraId\": \"api-node-prod\", \"serviceId\": \"defect_detection\"}" ^
+                    http://35.181.135.32:16000/v2/infrastructures/deploy
+
+                """
             }
         }
     }
 }
+        
+       
 
