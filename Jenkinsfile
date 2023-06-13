@@ -24,6 +24,40 @@ pipeline {
             }
         }
         
+        stage('Create API Package') {
+            steps {
+                script {
+                    bat """
+                    curl -X POST ^
+                    -H "Content-Type: application/json" ^
+                    -H "Authorization: Bearer 2GEJJFF192HSWH3JRMKFXYDRBEVWQ559" ^
+                    -d "{\"serviceId\": \"defect_detection\", \"endpoint_id\": \"predict_defect\"}" ^
+                    http://35.181.135.32:16000/projects/STAGETEST2/api-designer/v6/
+                    """
+                }
+            }
+        }
+        
+        // API request to create a package
+       stage('Create API Package') {
+            steps {
+                script {
+                    def apiService = new com.dataiku.dip.api.DSSAPIService()
+                    def packageParams = [
+                        "serviceId": "defect_detection",
+                        "endpointId": "predict_defect"
+                    ]
+                    def packageResponse = apiService.create_package(packageParams)
+                    
+                    if (packageResponse.status == 201) {
+                        println "API package created successfully."
+                    } else {
+                        println "Failed to create API package. Status code: ${packageResponse.status}"
+                    }
+                }
+            }
+        }
+        
         stage('Dataiku API Testing') {
             steps {
                 // Make API calls to Dataiku for testing
