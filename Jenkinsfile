@@ -19,8 +19,12 @@ pipeline {
         
         stage('Build') {
             steps {
-                // Build steps here (e.g., compiling code, running tests)
-                echo 'Hello'
+                // Set up the Maven environment
+                sh 'mvn -B -N io.takari:maven:wrapper'
+                // Resolve and download the dependencies
+                sh './mvnw dependency:resolve'
+                // Build the project
+                sh './mvnw clean install'
             }
         }
         
