@@ -17,16 +17,6 @@ pipeline {
             }
         }
         
-        stage('Build') {
-            steps {
-                // Set up the Maven environment
-                bat 'mvn -B -N io.takari:maven:wrapper'
-                // Resolve and download the dependencies
-                bat './mvnw dependency:resolve'
-                // Build the project
-                bat './mvnw clean install'
-            }
-        }
         
         stage('Create API Package') {
             steps {
