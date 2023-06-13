@@ -4,5 +4,9 @@
         <artifactId>dip-api-client</artifactId>
         <version>11.2.0</version>
     </dependency>
-    <!-- Add other dependencies here -->
+    <dependency>
+        <groupId>com.dataiku.dip</groupId>
+        <artifactId>dip-api</artifactId>
+        <version>11.2.0</version>
+    </dependency>
 </dependencies>
