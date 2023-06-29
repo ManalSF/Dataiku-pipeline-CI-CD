@@ -26,6 +26,6 @@ jobs:
         run: |
           curl -X POST \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer {{ secrets.DESIGN_API_KEY }}" \
-          -d "{\"serviceId\": {{ secrets.API_SERVICE_ID }}, \"endpoint_id\": {{ secrets.API_ENDPOINT_ID }} }" \
-          {{ secrets.DESIGN_URL }}projects/STAGETEST2/api-designer/v6/
+          -H "Authorization: Bearer ${{ secrets.DESIGN_API_KEY }}" \
+          -d "{\"serviceId\": ${{ secrets.API_SERVICE_ID }}, \"endpoint_id\": ${{ secrets.API_ENDPOINT_ID }} }" \
+          ${{ secrets.DESIGN_URL }}projects/STAGETEST2/api-designer/v6/
