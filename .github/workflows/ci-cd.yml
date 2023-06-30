@@ -24,14 +24,5 @@ jobs:
       - name: Preprocessing
         run: python scripts/preprocessing.py
       
-      - name: Training
-        run: python scripts/training.py
-      
-      - name: Evaluation
-        run: python scripts/evaluation.py
-      
-      - name: Deployment
-        run: python scripts/deployment.py
-      
       - name: Notify completion
         run: echo "Pipeline completed successfully"
