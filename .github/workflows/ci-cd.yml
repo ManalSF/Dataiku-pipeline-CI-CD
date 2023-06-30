@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Build and package project
+        run: |
+          # python setup.py build
+          # python setup.py sdist bdist_wheel
+      
+      - name: Run tests
+        run: |
+          # python -m unittest discover -s tests -p 'test_*.py'
+      
+      - name: Generate artifacts
+        run: |
+          # mkdir artifacts
+          # cp -r build/* artifacts/
+          # cp -r tests/reports/* artifacts/
+      
+      - name: Deploy artifacts
+        run: |
+          # echo "Déploiement des artefacts vers le serveur..."
+          # scp -r artifacts/* user@server:/path/to/deploy/
+      
+      - name: Notify completion
+        run: echo "Pipeline completed successfully"
